@@ -4,6 +4,7 @@ test
 runs/detect/*/weights
 *.cache
 
+.DS_Store
 
 data/*/*/*/*.jpg
 data/*/*/*/*.txt

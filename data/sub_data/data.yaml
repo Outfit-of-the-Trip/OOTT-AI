@@ -1,0 +1,28 @@
+names:
+- blazer
+- denim jacket
+- leather jacket
+- coat
+- windbreaker jacket
+- cardigan
+- puffer
+- tee shirt
+- long sleeve shirt
+- tank top
+- shirt
+- polo shirt
+- sweat shirt
+- hoodie sweat shirt
+- knit sweater
+- dress
+- jeans
+- slacks
+- sweat pants
+- skirt
+- shorts pants
+- sneakers
+- dress shoes
+- sandals
+nc: 24
+train: /home/jerife/programming/project/OOTT-AI/data/sub_data/train/images
+val: /home/jerife/programming/project/OOTT-AI/data/sub_data/valid/images

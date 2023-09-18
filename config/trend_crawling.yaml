@@ -1,0 +1,4 @@
+debug: True
+secrect_dir: ./config/secrets.yaml
+image_num: 5
+save_dir: ./data/crawling_images

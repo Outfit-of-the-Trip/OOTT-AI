@@ -1,0 +1,10 @@
+model:
+  dir: ./runs/detect/train/weights/best.onnx
+  iou_thres: 0.25
+  conf_thres: 0.55
+
+info:
+  host: 0.0.0.0
+  port: 5543
+  log_level: info
+  workers: 1

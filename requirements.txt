@@ -1,0 +1,8 @@
+# server.py
+
+# base / target_model.py 
+
+
+# trend_crawling.py
+selenium==4.11.2
+webdriver_manager

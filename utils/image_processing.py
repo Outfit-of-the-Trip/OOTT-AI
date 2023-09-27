@@ -5,6 +5,11 @@ import numpy as np
 import io
 import base64
 
+outter = ['blazer', 'denim jacket', 'leather jacket', 'coat', 'windbreaker jacket', "cardigan", "puffer"]
+top = ["tee shirt", "long sleeve shirt", "tank top", "shirt", "polo shirt", "sweat shirt", "hoodie sweat shirt", "knit sweater", "dress"]
+bottom = [ "jeans", "slacks", "sweat pants", "skirt", "shorts pants",]
+shoes = ["sneakers", "dress shoes", "sandals"]
+        
 def get_image_color(image):
     colors, pixel_count = extcolors.extract_from_image(image)
     best_color = colors[0][0]
@@ -22,10 +27,6 @@ def get_image_color(image):
 
 
 def get_combi(combi):
-    outter = ['blazer', 'denim jacket', 'leather jacket', 'coat', 'windbreaker jacket', "cardigan", "puffer"]
-    top = ["tee shirt", "long sleeve shirt", "tank top", "shirt", "polo shirt", "sweat shirt", "hoodie sweat shirt", "knit sweater", "dress"]
-    bottom = [ "jeans", "slacks", "sweat pants", "skirt", "shorts pants",]
-    shoes = ["sneakers", "dress shoes", "sandals"]
     best_outter = ['', 0]
     best_top = ['', 0]
     best_bottom = ['', 0]
@@ -57,19 +58,33 @@ def get_image_info(images, boxes, labels, scores):
     label_list = []
     color_list = []
     combi_list = []
+    categori_list = []
     
     for image, box, label, score in zip(images, boxes, labels, scores):
         pil_image=Image.fromarray(image)
         combi = []
+        
         for b, l, s in zip(box, label, score):
             cropped_image = pil_image.crop(b)
             crop_list.append(cropped_image)
             label_list.append(l)
             color_list.append(get_image_color(cropped_image))
             combi.append([l, s])
+            
+            if l in outter:
+                categori = 'outter'
+            elif l in top:
+                categori = 'top'
+            elif l in bottom:
+                categori = 'bottom'
+            elif l in shoes:
+                categori = 'shoes'
+            categori_list.append(categori)
+            
         combi_list.append(get_combi(combi))
         
-    return crop_list, label_list, color_list, combi_list
+        
+    return crop_list, label_list, color_list, combi_list, categori_list
 
 
 def from_image_to_bytes(img):

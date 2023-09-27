@@ -1,7 +1,6 @@
 from ultralytics import YOLO
 
 import argparse
-import yaml
 import os
 
 from utils import load_config
@@ -21,6 +20,7 @@ def main(parser):
     
     if cfg['conver_to_onnx']:
         target_model.export(format='onnx')
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

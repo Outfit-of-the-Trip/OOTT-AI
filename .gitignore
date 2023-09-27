@@ -1,22 +1,25 @@
-test
-
-*.ipynb
-runs/detect/*/weights
-*.cache
-
-.DS_Store
-
+### Image Data ###
 data/*/*/*/*.jpg
 data/*/*/*/*.txt
 data/*/*.jpg
 !sample.jpg
 !sample.txt
 
+### Model, Secret and chorme ###
 config/secrets.yaml
+runs/detect/*/weights
+google-chrome-stable_current_amd64.deb
+
+
+### Debug file ###
+test
+*.ipynb
+*.cache
+.DS_Store
+
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,visualstudiocode
-
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/

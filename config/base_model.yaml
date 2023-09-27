@@ -1,6 +1,6 @@
 model: GroundedSAM
-input_dir: ./data/sub_images # Set the path to the input image
-output_dir: ./data/sub_data # Set a path to store the psudo dataset.
-data_merge: True # Merges existing and psudo datasets.
+input_dir: ./data/sub_images
+output_dir: ./data/sub_data
+data_merge: True
 main_data_dir: ./data/main_data
 merge_data_dir: ./data/augmented_data

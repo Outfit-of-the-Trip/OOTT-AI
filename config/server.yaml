@@ -1,3 +1,5 @@
+secret_dir: ./config/secrets.yaml
+
 model:
   dir: ./runs/detect/train/weights/best.onnx
   iou_thres: 0.25

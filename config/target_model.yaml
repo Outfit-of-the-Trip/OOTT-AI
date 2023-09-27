@@ -1,4 +1,4 @@
 model: yolov8m
-data_path: /home/jerife/programming/project/OOTT-AI/data/augmented_data/data.yaml
+data_path: ./data/main_data/data.yaml
 epochs: 1000
 conver_to_onnx: True

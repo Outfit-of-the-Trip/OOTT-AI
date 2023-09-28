@@ -16,8 +16,9 @@ def transfer_data_to_db(crop_list, label_list, color_list, categori_list, combi_
     for label, color, categori in zip(label_list, color_list, categori_list):
         cur.execute(f"INSERT INTO CRAWL_DATA(crawlCategory, crawlClothesCategory, crawlClothes, crawlColor, crawlCount, crawlDate) VALUES ('{recommend_type}','{categori}','{label}','{color}',{1},'{date}')")
     for combi, combi_color in zip(combi_list, combi_color_list):
-        cur.execute(f"INSERT INTO CRAWL_DATA(cooridiCategory, cooridiClothes, cooridiColor, cooridiCount, cooridiDate) VALUES ('{recommend_type}','{','.join(combi)}',{','.join(combi_color)}, {1}, '{date}')")
+        combi = ','.join(combi)
+        combi_color = ','.join(combi_color)
+        cur.execute(f"INSERT INTO CRAWL_COORDI(coordiCategory, coordiClothes, coordiColor, coordiCount, coordiDate) VALUES ('{recommend_type}','{combi}','{combi_color}',{1},'{date}')") #  나중에 중복처리시 참고: ON DUPLICATE KEY UPDATE coordiCount = coordiCount + 1
     
     conn.commit()
     conn.close()
-    return True

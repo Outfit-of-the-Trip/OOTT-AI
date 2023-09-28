@@ -1,9 +1,10 @@
-numpy==1.21.6
+selenium
+webdriver_manager
 pyyaml==6.0.1
 Pillow==9.5.0
 extcolors==1.0.0
-pymysql-1.1.0
-deepsparse-1.5.3
+pymysql==1.1.0
+deepsparse==1.5.3
 deepsparse[yolo]
 deepsparse[yolov8]
 fastapi==0.103.1
@@ -11,3 +12,5 @@ uvicorn==0.23.2
 python-multipart
 autodistill==0.1.12
 google-cloud-storage
+opencv-python==4.6.0.66
+numpy==1.20.0

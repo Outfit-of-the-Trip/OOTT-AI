@@ -2,4 +2,5 @@ debug: True
 secret_dir: ./config/secrets.yaml
 image_num: 2
 save_dir: ./data/crawling_images
+save_gcs: True
 serve_info: True

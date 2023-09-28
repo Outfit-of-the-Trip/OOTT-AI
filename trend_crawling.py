@@ -1,26 +1,33 @@
 import argparse
+import shutil
+import urllib.request
+import ssl
+import time
+import requests
+from glob import glob 
+import base64
+import os
+from datetime import datetime
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium import webdriver
 
-import urllib.request
-import ssl
-import time
-import requests
-from glob import glob 
-import os
-from datetime import datetime
+from google.cloud import storage
 
 from utils import load_config
 ssl._create_default_https_context = ssl._create_unverified_context
 
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 
+def gcs_setting(cfg):
+    global bucket
+    secret = load_config(cfg['secret_dir'])
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = secret['trend_crawling']['gcs']['key']
+    storage_client = storage.Client()
+    bucket = storage_client.bucket("oott_crawling")
 
 def crawling_setting(cfg):
     global driver
@@ -47,6 +54,7 @@ def crawling_setting(cfg):
 def main(parser):
     cfg = parser.parse_args()
     cfg = load_config(cfg.config)
+    gcs_setting(cfg)
     
     if cfg['debug']:
         핫플레이스 = ['홍대','연남동']
@@ -73,8 +81,8 @@ def main(parser):
     date = datetime.now().strftime("%Y-%m-%d")
     
     for location_categori, location_list in location_dict.items():
-        save_dir = os.path.join(cfg['save_dir'], date, location_categori)
-        os.makedirs(save_dir, exist_ok=True)
+        save_dir = cfg['save_dir']
+        os.makedirs(f'{save_dir}/{date}/{location_categori}', exist_ok=True)
         i = 0
         
         for location in location_list:
@@ -89,21 +97,38 @@ def main(parser):
                     #사진 저장
                     img_element = driver.find_element(By.CSS_SELECTOR, '._aatk .x5yr21d.xu96u03.x10l6tqk.x13vifvy.x87ps6o.xh8yej3')
                     img_src = img_element.get_attribute('src')
-                    urllib.request.urlretrieve(img_src, f'{save_dir}/{i}.jpg')
+                    save_name = f'{date}/{location_categori}/{i}.jpg'
+                    urllib.request.urlretrieve(img_src, f'{save_dir}/{save_name}')
                     i += 1
+                    
+                    # Saving image to gcs
+                    if cfg['save_gcs']:
+                        blob = bucket.blob(save_name)
+                        blob.upload_from_filename(f'{save_dir}/{save_name}')
 
-                    # 다음 버튼 클릭
-                    driver.find_element(By.CSS_SELECTOR, '._aaqg ._abl-').click()
+                    driver.find_element(By.CSS_SELECTOR, '._aaqg ._abl-').click() # Click next button
                 except:
-                    # 다음 버튼 클릭
-                    driver.find_element(By.CSS_SELECTOR, '._aaqg ._abl-').click()
+                    driver.find_element(By.CSS_SELECTOR, '._aaqg ._abl-').click() # Click next button
 
         if cfg['serve_info']:
-            data_path_list = glob(save_dir+'/*')
-            files = [('request', open(img, 'rb')) for img in data_path_list]
+            images = []
+            data_path_list = glob(f'{save_dir}/{date}/{location_categori}/*')
+            
+            for img in data_path_list:
+                with open(img, "rb") as f:
+                    im_bytes = f.read()  
+                im_b64 = base64.b64encode(im_bytes).decode("utf8")
+                images.append(im_b64)
 
-            url = f'http://0.0.0.0:5543/predict/batch?recommend_type={location_categori}'
-            resp = requests.post(url=url, files=files)
+            url = f'http://0.0.0.0:5543/predict/batch'
+            payload = {
+                "base64_images": images,
+                "recommend_type": location_categori
+            }
+            resp= requests.post(url=url, json=payload)
+    
+    shutil.rmtree(f'{save_dir}/{date}') # Remove loacl image
+    print(f"{date}: Finished Crawling")
 
 
 if __name__ == '__main__':

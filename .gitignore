@@ -7,9 +7,9 @@ data/*/*.jpg
 
 ### Model, Secret and chorme ###
 config/secrets.yaml
+gcs.json
 runs/detect/*/weights
 google-chrome-stable_current_amd64.deb
-
 
 ### Debug file ###
 test

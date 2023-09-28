@@ -1,15 +1,16 @@
 import argparse
-from typing import List
-from fastapi import FastAPI, UploadFile
+
+from fastapi import FastAPI
 import uvicorn
 from starlette.responses import RedirectResponse
-from fastapi.responses import JSONResponse, Response
-from typing import List
 
-from utils import get_image_info, transfer_data_to_db, load_deepsparse_model, load_config, from_image_to_bytes
+from utils import load_deepsparse_model, load_config
+from utils import get_batch_info, get_camera_info, transfer_data_to_db
+from utils import base64_list_to_image
+from utils import CameraPredictIn, CameraPredictOut, BatchPredictIn, BatchPredictOut
 
 
-def build_app(cfg):
+def build_app(cfg, secret):
     """Load Yolov8 Model"""
     pipeline = load_deepsparse_model(model_path=cfg['model']['dir'])
     
@@ -27,71 +28,65 @@ def build_app(cfg):
     def _health():
         return True
 
-    @app.post("/predict/batch", tags=["AI"], response_model=bool)
-    async def batch_predict(request: List[UploadFile], recommend_type: str):
-        if len(request) > 16: # Only receive 16 under data to protect server overload
-            return False
+    @app.post("/predict/batch", tags=["AI"], response_model=BatchPredictOut)
+    async def batch_predict(request: BatchPredictIn):
+        request_images_list = request.base64_images
+        recommend_type = request.recommend_type
         
-        request = pipeline.input_schema.from_files(
-                (file.file for file in request), from_server=True
+        request_images_list = [request_images_list[i:i+16] for i in range(0, len(request_images_list), 16)] # Only receive 16 under data to protect server overload
+        for request in request_images_list:
+            request = base64_list_to_image(request)
+
+            pipeline_outputs = pipeline(
+                images=request,
+                iou_thres=cfg['model']['iou_thres'],
+                conf_thres=cfg['model']['conf_thres']
+            )
+            
+            crop_list, label_list, color_list, categori_list, combi_list, combi_color_list = get_batch_info(
+                request,
+                pipeline_outputs.boxes,
+                pipeline_outputs.labels,
+                pipeline_outputs.scores
+            )
+            transfer_data_to_db(crop_list, label_list, color_list, categori_list, combi_list, combi_color_list, recommend_type, secret)
+        
+        return_dict = {
+            'result': True
+        }
+        return return_dict
+        
+    @app.post("/predict/camera", tags=["AI"], response_model=CameraPredictOut)
+    async def camera_predict(request: CameraPredictIn):
+        request = base64_list_to_image([request.base64_image])[0]
+        pipeline_outputs = pipeline(
+            images=request,
+            iou_thres=cfg['model']['iou_thres'],
+            conf_thres=cfg['model']['conf_thres']
         )
-        request.iou_thres = 0.25
-        request.conf_thres = 0.55
-        pipeline_outputs = pipeline(request)
-        crop_list, label_list, color_list, combi_list = get_image_info(
-            request.images,
+        
+        best_label, bset_color = get_camera_info(
+            request,
             pipeline_outputs.boxes,
             pipeline_outputs.labels,
             pipeline_outputs.scores
         )
-        print("crop_list", crop_list)
-        print("label_list", label_list)
-        print("color_list", color_list)
-        print("combi_list", combi_list)
-        print(pipeline_outputs)
         
-        return transfer_data_to_db(crop_list, label_list, color_list, combi_list, recommend_type)
-
-
-    @app.post("/predict/each", tags=["AI"])
-    async def each_predict(request: List[UploadFile]):
-        request = pipeline.input_schema.from_files(
-                (file.file for file in request), from_server=True
-        )
-        request.iou_thres = cfg['model']['iou_thres']
-        request.conf_thres = cfg['model']['conf_thres']
-        pipeline_outputs = pipeline(request)
-        crop_list, label_list, color_list, combi_list = get_image_info(
-            request.images,
-            pipeline_outputs.boxes,
-            pipeline_outputs.labels,
-            pipeline_outputs.scores
-        )
+        return_dict = {
+            'label': best_label,
+            'color': bset_color
+        }
+        return return_dict
         
-        print("crop_list", crop_list)
-        print("label_list", label_list)
-        print("color_list", color_list)
-        print("combi_list", combi_list)
-        # print(pipeline_outputs)
-        
-        # encoding_images = [from_image_to_bytes(img) for img in crop_list]
-        print(type(crop_list[0]))
-        print(crop_list[0])
-        byte_test = crop_list[0]
-        # return_json = {
-        #     "byte_images": encoding_images,
-        #     "label_list": label_list,
-        #     "color_list": color_list
-        # }
-        return Response(content=byte_test, media_type="image/jpg")
-
     return app
+
 
 def main(parser):
     cfg = parser.parse_args()
     cfg = load_config(cfg.config)
+    secret = load_config(cfg['secret_dir'])
     
-    app = build_app(cfg)
+    app = build_app(cfg, secret)
     uvicorn.run(
         app,
         host=cfg['info']['host'],
@@ -99,6 +94,7 @@ def main(parser):
         log_level=cfg['info']['log_level'],
         workers=cfg['info']['workers'],
     )
+    
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

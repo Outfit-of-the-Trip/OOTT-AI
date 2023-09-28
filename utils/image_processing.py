@@ -41,32 +41,32 @@ def get_image_color(image):
 
 
 def get_combi(combi):
-    best_outter = ['', 0, 0]
-    best_top = ['', 0, 0]
-    best_bottom = ['', 0, 0]
-    best_shoes = ['', 0, 0]
+    best_outter = ['None', 0, 'None']
+    best_top = ['None', 0, 'None']
+    best_bottom = ['None', 0, 'None']
+    best_shoes = ['None', 0, 'None']
     
     for l, s, c in combi:
         if l in outter:
             if best_outter[1] < s:
                 best_outter[0] = l
                 best_outter[1] = s
-                best_outter[2] = c
+                best_outter[2] = str(c)
         elif l in top:
             if best_top[1] < s:
                 best_top[0] = l
                 best_top[1] = s
-                best_top[2] = c
+                best_top[2] = str(c)
         elif l in bottom:
             if best_bottom[1] < s:
                 best_bottom[0] = l
                 best_bottom[1] = s
-                best_bottom[2] = c
+                best_bottom[2] = str(c)
         elif l in shoes:
             if best_shoes[1] < s:
                 best_shoes[0] = l
                 best_shoes[1] = s
-                best_shoes[2] = c
+                best_shoes[2] = str(c)
     
     return [best_outter[0], best_top[0], best_bottom[0], best_shoes[0]], [best_outter[2], best_top[2], best_bottom[2], best_shoes[2]]
           
@@ -111,8 +111,9 @@ def get_batch_info(images, boxes, labels, scores):
             categori_list.append(categori)
         
         combi_clothes, combi_color = get_combi(combi)
-        combi_list.append(combi_clothes)
-        combi_color_list.append(combi_color)
+        if combi_clothes!=['None','None','None','None']:
+            combi_list.append(combi_clothes)
+            combi_color_list.append(combi_color)
         
     return crop_list, label_list, color_list, categori_list, combi_list, combi_color_list
 

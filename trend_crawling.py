@@ -79,6 +79,7 @@ def main(parser):
     
     crawling_setting(cfg)
     date = datetime.now().strftime("%Y-%m-%d")
+    print(f"{date}: Start Crawling")
     
     for location_categori, location_list in location_dict.items():
         save_dir = cfg['save_dir']

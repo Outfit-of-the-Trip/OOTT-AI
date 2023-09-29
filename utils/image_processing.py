@@ -27,15 +27,21 @@ def base64_list_to_image(base64_list):
 def get_image_color(image):
     colors, pixel_count = extcolors.extract_from_image(image)
     best_color = colors[0][0]
-    primary_colors = [(255,255,255), (235,211,176), (0,0,255), (128,128,128), (0,0,0)] 
+    primary_colors = {
+        'white': (255,255,255),
+        'beige': (235,211,176), 
+        'blue': (74,93,125), 
+        'gray': (82, 82, 82), 
+        'black': (0,0,0)
+    }
     
     min_dist=10000
-    min_color=0
-    for i, primary_color in enumerate(primary_colors):
+    min_color='None'
+    for primary_color_name, primary_color in primary_colors.items():
         dist = np.linalg.norm(np.array(best_color)-np.array(primary_color))
         if dist < min_dist:
             min_dist = dist
-            min_color = i
+            min_color = primary_color_name
 
     return min_color 
 
@@ -123,6 +129,7 @@ def get_camera_info(images, boxes, labels, scores):
     
     for image, box, label, score in zip(images, boxes, labels, scores):
         pil_image=Image.fromarray(image)
+        
         for b, l, s in zip(box, label, score):
             if s > best_score:
                 best_label = l

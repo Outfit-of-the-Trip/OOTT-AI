@@ -36,7 +36,7 @@ def build_app(cfg, secret):
         request_images_list = [request_images_list[i:i+16] for i in range(0, len(request_images_list), 16)] # Only receive 16 under data to protect server overload
         for request in request_images_list:
             request = base64_list_to_image(request)
-
+            request = [img[:,:,::-1] for img in request]
             pipeline_outputs = pipeline(
                 images=request,
                 iou_thres=cfg['model']['iou_thres'],
@@ -58,9 +58,11 @@ def build_app(cfg, secret):
         
     @app.post("/predict/camera", tags=["AI"], response_model=CameraPredictOut)
     async def camera_predict(request: CameraPredictIn):
-        request = base64_list_to_image([request.base64_image])[0]
+        request = base64_list_to_image([request.base64_image])
+        request = [img[:,:,::-1] for img in request]
+
         pipeline_outputs = pipeline(
-            images=request,
+            images=request[0],
             iou_thres=cfg['model']['iou_thres'],
             conf_thres=cfg['model']['conf_thres']
         )

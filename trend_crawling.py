@@ -79,7 +79,7 @@ def main(parser):
     
     crawling_setting(cfg)
     date = datetime.now().strftime("%Y-%m-%d")
-    print(f"{date}: Start Crawling")
+    print(f"#################### {date}: Start Crawling ####################")
     
     for location_categori, location_list in location_dict.items():
         save_dir = cfg['save_dir']
@@ -87,6 +87,7 @@ def main(parser):
         i = 0
         
         for location in location_list:
+            print(f'{date}: {location_categori} - {location}')
             time.sleep(3)
             driver.get(f'https://www.instagram.com/explore/tags/{location}/')
             driver.implicitly_wait(15)
@@ -129,7 +130,7 @@ def main(parser):
             resp= requests.post(url=url, json=payload)
     
     shutil.rmtree(f'{save_dir}/{date}') # Remove loacl image
-    print(f"{date}: Finished Crawling")
+    print(f"#################### {date}: Finished Crawling ####################")
 
 
 if __name__ == '__main__':

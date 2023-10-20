@@ -1,7 +1,7 @@
 <h1 align=center>Outfit Of The Travel - AI API Server</h1>
 
 <div align="center">
-    <img src="images/image-5.png" width="100%"/> 
+    <img src="images/image-5.png" width="80%"/> 
 </div>
 
 > OOTT(Outfit Of The Travel) 
@@ -82,13 +82,13 @@ Since there are 24 classes in the dataset, it is assumed that inappropriate pseu
 
 ### Why did you use Deep sparse to deploy your model?
 <div align="center">
-    <img src="images/image-3.png" width="80%"/> 
+    <img src="images/image-3.png" width="60%"/> 
 </div>
 
 DeepSparse is a CPU inference runtime that takes advantage of sparsity within neural networks to execute inference quickly. So we adopted DeepSparse for smooth service delivery in a CPU-based server environment.
 
 <div align="center">
-    <img src="images/image-2.png" width="80%"/> 
+    <img src="images/image-2.png" width="60%"/> 
 </div>
 
 ---

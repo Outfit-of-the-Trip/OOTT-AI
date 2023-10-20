@@ -6,7 +6,7 @@ import io
 import base64
 import cv2
 
-outter = ['blazer', 'denim jacket', 'leather jacket', 'coat', 'windbreaker jacket', "cardigan", "puffer"]
+outer = ['blazer', 'denim jacket', 'leather jacket', 'coat', 'windbreaker jacket', "cardigan", "puffer"]
 top = ["tee shirt", "long sleeve shirt", "tank top", "shirt", "polo shirt", "sweat shirt", "hoodie sweat shirt", "knit sweater", "dress"]
 bottom = [ "jeans", "slacks", "sweat pants", "skirt", "shorts pants",]
 shoes = ["sneakers", "dress shoes", "sandals"]
@@ -47,17 +47,17 @@ def get_image_color(image):
 
 
 def get_combi(combi):
-    best_outter = ['None', 0, 'None']
+    best_outer = ['None', 0, 'None']
     best_top = ['None', 0, 'None']
     best_bottom = ['None', 0, 'None']
     best_shoes = ['None', 0, 'None']
     
     for l, s, c in combi:
-        if l in outter:
-            if best_outter[1] < s:
-                best_outter[0] = l
-                best_outter[1] = s
-                best_outter[2] = str(c)
+        if l in outer:
+            if best_outer[1] < s:
+                best_outer[0] = l
+                best_outer[1] = s
+                best_outer[2] = str(c)
         elif l in top:
             if best_top[1] < s:
                 best_top[0] = l
@@ -74,7 +74,7 @@ def get_combi(combi):
                 best_shoes[1] = s
                 best_shoes[2] = str(c)
     
-    return [best_outter[0], best_top[0], best_bottom[0], best_shoes[0]], [best_outter[2], best_top[2], best_bottom[2], best_shoes[2]]
+    return [best_outer[0], best_top[0], best_bottom[0], best_shoes[0]], [best_outer[2], best_top[2], best_bottom[2], best_shoes[2]]
           
 
 def from_image_to_bytes(img):
@@ -106,8 +106,8 @@ def get_batch_info(images, boxes, labels, scores):
             color_list.append(c)
             combi.append([l, s, c])
             
-            if l in outter:
-                categori = 'outter'
+            if l in outer:
+                categori = 'outer'
             elif l in top:
                 categori = 'top'
             elif l in bottom:
